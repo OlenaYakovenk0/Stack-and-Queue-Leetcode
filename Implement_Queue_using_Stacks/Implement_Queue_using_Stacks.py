@@ -3,76 +3,67 @@ class Node:
         self.data = data
         self.next = next
 
-class LinkedStack:
-    def __init__(self, iterable=None):
-        self._items = None
-        self._size = 0
-        if iterable:
-            for item in iterable:
-                self.push(item)
+class Stack:
 
-    def isEmpty(self):
-        return self._size == 0
+    def __init__(self):
+        self.head = None
 
-    def __len__(self):
-        return self._size
+    def is_empty(self):
+        return self.head is None
 
-    def __str__(self):
-        return "[" + ", ".join(map(str, self)) + "]"
-
-    def __iter__(self):
-        def visitNodes(node):
-            if node:
-                yield from visitNodes(node.next)
-                yield node.data
-        return visitNodes(self._items)
-
-    def peek(self):
-        if self.isEmpty():
-            raise KeyError("Stack is empty.")
-        return self._items.data
-
-    def clear(self):
-        self._items = None
-        self._size = 0
-
-    def push(self, item):
-        self._items = Node(item, self._items)
-        self._size += 1
+    def push(self, data):
+        self.head = Node(data, self.head)
 
     def pop(self):
-        if self.isEmpty():
-            raise KeyError("Stack is empty.")
-        item = self._items.data
-        self._items = self._items.next
-        self._size -= 1
-        return item
+        if self.is_empty():
+            raise ValueError('Stack is empty')
+        data = self.head.data
+        self.head = self.head.next
+        return data
 
+    @property
+    def peek(self):
+        if self.is_empty():
+            raise ValueError('Stack is empty')
+        else:
+            return self.head.data
+
+    def __len__(self):
+        count = 0
+        current = self.head
+        while current is not None:
+            count +=1
+            current = current.next
+        return count
+
+    def __str__(self):
+        s = ''
+        current = self.head
+        while current is not None:
+            s = str(current.data) + ' ' +s
+            current = current.next
+        return 'bottom -> '+ s+'<- top'
 
 class MyQueue:
 
     def __init__(self):
-        self.push_stack = LinkedStack()
-        self.pop_stack = LinkedStack()
-
+        self.push_stack = Stack()
+        self.pop_stack = Stack()
 
     def push(self, x: int) -> None:
-        while not self.pop_stack.isEmpty():
+        while not self.pop_stack.is_empty():
             self.push_stack.push(self.pop_stack.pop())
         self.push_stack.push(x)
 
-
     def pop(self) -> int:
-        while not self.push_stack.isEmpty():
+        while not self.push_stack.is_empty():
             self.pop_stack.push(self.push_stack.pop())
         return self.pop_stack.pop()
 
-
     def peek(self) -> int:
-        while not self.push_stack.isEmpty():
+        while not self.push_stack.is_empty():
             self.pop_stack.push(self.push_stack.pop())
-        return self.pop_stack.peek()
-
+        return self.pop_stack.peek
 
     def empty(self) -> bool:
-        return self.push_stack.isEmpty() and self.pop_stack.isEmpty()
+        return self.push_stack.is_empty() and self.pop_stack.is_empty()
